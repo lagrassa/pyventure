@@ -9,13 +9,13 @@ screen = pygame.display.set_mode((screen_height, screen_width), 0, 32)
 screen.fill((255,255,255))
 mainClock = pygame.time.Clock()
 class Bubble():
-    def __init__(self, data):
+    def __init__(self, data, center):
         self.data = data #:["{'a':5, 'b':6}","[Jess, Alex]","3.0/2","3/2","'Hello'", "(1,5)"]
         self.example_data_types = ["dictionary","list","float","int","string","tuple"]
         self.current_example_index = 0
         self.current_example = self.data[0]
         self.radius = 60
-        self.center = (100,200)
+        self.center = center
     def draw_bubble(self):
         circleRect = pygame.draw.circle(screen, (10, 60, 30), self.center, self.radius)
     def grow(self,amount_to_grow):
@@ -68,7 +68,9 @@ class Data_Displayer():
 
 # Main method of the program
 data = ["{'a':5, 'b':6}","[Jess, Alex]","3.0/2","3/2","'Hello'", "(1,5)"]
-correct_bubble = Bubble(data)
+bubble_center = (100,200) 
+correct_bubble = Bubble(data, bubble_center)
+
 data_type_displayer_x =200
 data_type_displayer_y =350
 data_types= ["dictionary", "list", "float", "int", "string", "tuple"]

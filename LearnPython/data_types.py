@@ -76,7 +76,7 @@ class Data_Displayer():
         self.y = y
         self.number = 0
     def draw_self(self):
-        self.rect = pygame.draw.rect(screen, (25,25,25), (self.x, self.y, screen_width/2.0, screen_height/5.0), 2)
+        self.rect = pygame.draw.rect(screen, (25,25,25), (self.x, self.y, screen_width/3.0, screen_height/9.0), 2)
     def addText(self):
         screen.blit(font.render(self.current_data_type, True, (255,0,0)), (self.x+50, self.y +25))
         pygame.display.update()
@@ -101,14 +101,15 @@ correct_bubble = Bubble(data, bubble_center, green)
 wrong_bubble = Bubble(wrong_data, wrong_bubble_center, blue)
 movementAmount = 5
 data_type_displayer_x =200
-data_type_displayer_y =350
+data_type_displayer_y =600
 data_types= ["dictionary", "list", "float", "int", "string", "tuple"]
 data_type_displayer= Data_Displayer(data_type_displayer_x, data_type_displayer_y, data_types)
 
-score_display_x = 300 
-score_display_y = 100
+score_display_x = (2/3.0)*screen_width 
+score_display_y = 0
 score_displayer = Data_Displayer(score_display_x, score_display_y, None) #None is the last parameter because scores don't store data types
 ################### Main Game Loop ########################
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

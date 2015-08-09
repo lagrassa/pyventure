@@ -32,13 +32,14 @@ mainClock = pygame.time.Clock()
 #Contributions
 
 class Bubble():
-    def __init__(self, data, center, color):
+    def __init__(self, is_correct, data, center, color):
         self.data = data #:["{'a':5, 'b':6}","[Jess, Alex]","3.0/2","3/2","'Hello'", "(1,5)"]
         self.example_data_types = ["dictionary","list","float","int","string","tuple"]
         self.current_example_index = 0
         self.current_example = self.data[0]
         self.radius = 60
         self.center = center
+        self.is_correct = is_correct
         self.color = color
     def draw_bubble(self):
         circleRect = pygame.draw.circle(screen, self.color, self.center, self.radius)
@@ -46,7 +47,10 @@ class Bubble():
         self.radius = self.radius + amount_to_grow
     def change_displayed_data(self):
         self.current_example_index +=1
-        self.current_example = self.data[self.current_example_index]
+        if is_correct:
+            self.current_example = correct_data[self.current_example_index]
+        else:
+            self.current_example = self.data[self.current_example_index]
     def addText(self):
         #offset the text from the center
         x = self.center[0]-50
@@ -59,11 +63,7 @@ class Bubble():
             return True
         return False
     def is_correct(self, data_data_type_displayer):
-        bubble_type = self.example_data_types[self.current_example_index]
-        correct_type = data_data_type_displayer.current_data_type
-        if bubble_type == correct_type:
-            return True
-        return False
+        return self.is_correct
 
 class Data_Displayer():
     def __init__(self, x, y, data_types):
@@ -91,14 +91,15 @@ class Data_Displayer():
         pygame.display.update()
 
 # Main method of the program
-data = ["{'a':5, 'b':6}","[Jess, Alex]","3.0/2","3/2","'Hello'", "(1,5)"]
+correct_data = ["{'a':5, 'b':6}","[Jess, Alex]","3.0/2","3/2","'Hello'", "(1,5)"]
 wrong_data = ["[sponge, bob]","2/3","4/5","'goodbye'", "(2,7)", "{a:3}"]
 green = (10, 60, 30)
 blue = (0,0,205) 
 wrong_bubble_center = (230, 80)
 bubble_center = (100,200) 
-correct_bubble = Bubble(data, bubble_center, green)
-wrong_bubble = Bubble(wrong_data, wrong_bubble_center, blue)
+correct_bubble = Bubble(True, wrong_data,bubble_center, green)
+wrong_bubble = Bubble(False, wrong_data, wrong_bubble_center, blue)
+bubble_list = [correct_bubble, wrong_bubble]
 movementAmount = 5
 data_type_displayer_x =200
 data_type_displayer_y =600
@@ -119,12 +120,16 @@ while True:
                 correct_bubble.radius += -5
                 wrong_bubble.radius += 5
             position = pygame.mouse.get_pos()
-            if correct_bubble.is_in_range(position):
-                if correct_bubble.is_correct(data_type_displayer):
-                    data_type_displayer.change()
-                    correct_bubble.change_displayed_data()
-                    wrong_bubble.change_displayed_data()
-                    score_displayer.number_increase()
+            for bubble in bubble_list:
+                if bubble.is_in_range(position):
+                    if bubble.is_correct:
+                        #switch which bubble is correct
+                        randomBubble = (0,len(bubble_list)-1)
+                        randomBubble.is_correct = True
+                        data_type_displayer.change()
+                        correct_bubble.change_displayed_data()
+                        wrong_bubble.change_displayed_data()
+                        score_displayer.number_increase()
                 
     if (correct_bubble.center[0] > screen_width-correct_bubble.radius) or (correct_bubble.center[0] < correct_bubble.radius):
         movementAmount = -movementAmount

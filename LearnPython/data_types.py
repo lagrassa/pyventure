@@ -18,7 +18,7 @@
 #    Made one bubble grow while the other one shrinks
 
 import pygame
-
+import random
 pygame.init()
 screen_height = 700
 screen_width = 500
@@ -32,14 +32,14 @@ mainClock = pygame.time.Clock()
 #Contributions
 
 class Bubble():
-    def __init__(self, is_correct, data, center, color):
+    def __init__(self, data, center, color):
         self.data = data #:["{'a':5, 'b':6}","[Jess, Alex]","3.0/2","3/2","'Hello'", "(1,5)"]
         self.example_data_types = ["dictionary","list","float","int","string","tuple"]
         self.current_example_index = 0
         self.current_example = self.data[0]
         self.radius = 60
         self.center = center
-        self.is_correct = is_correct
+        self.is_correct = False
         self.color = color
     def draw_bubble(self):
         circleRect = pygame.draw.circle(screen, self.color, self.center, self.radius)
@@ -47,7 +47,7 @@ class Bubble():
         self.radius = self.radius + amount_to_grow
     def change_displayed_data(self):
         self.current_example_index +=1
-        if is_correct:
+        if self.is_correct:
             self.current_example = correct_data[self.current_example_index]
         else:
             self.current_example = self.data[self.current_example_index]
@@ -95,11 +95,11 @@ correct_data = ["{'a':5, 'b':6}","[Jess, Alex]","3.0/2","3/2","'Hello'", "(1,5)"
 wrong_data = ["[sponge, bob]","2/3","4/5","'goodbye'", "(2,7)", "{a:3}"]
 green = (10, 60, 30)
 blue = (0,0,205) 
-wrong_bubble_center = (230, 80)
+bubble2_center = (230, 80)
 bubble_center = (100,200) 
-correct_bubble = Bubble(True, wrong_data,bubble_center, green)
-wrong_bubble = Bubble(False, wrong_data, wrong_bubble_center, blue)
-bubble_list = [correct_bubble, wrong_bubble]
+bubble1 = Bubble(wrong_data,bubble_center, green)
+bubble2 = Bubble(wrong_data, bubble2_center, blue)
+bubble_list = [bubble1, bubble2]
 movementAmount = 5
 data_type_displayer_x =200
 data_type_displayer_y =600
@@ -110,39 +110,42 @@ score_display_x = (2/3.0)*screen_width
 score_display_y = 0
 score_displayer = Data_Displayer(score_display_x, score_display_y, None) #None is the last parameter because scores don't store data types
 ################### Main Game Loop ########################
+random_index= random.randint(0, len(bubble_list)-1)
+random_bubble = bubble_list[random_index]
+random_bubble.is_correct = True
+random_bubble.current_example = correct_data[0]
 
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if correct_bubble.radius > 50 and wrong_bubble.radius < 100:
-                correct_bubble.radius += -5
-                wrong_bubble.radius += 5
             position = pygame.mouse.get_pos()
             for bubble in bubble_list:
                 if bubble.is_in_range(position):
                     if bubble.is_correct:
                         #switch which bubble is correct
-                        randomBubble = (0,len(bubble_list)-1)
-                        randomBubble.is_correct = True
+                        bubble.is_correct = False # so we can pick a new correct bubble
+                        random_index = random.randint(0,len(bubble_list)-1)
+                        random_bubble = bubble_list[random_index]
+                        random_bubble.is_correct = True
                         data_type_displayer.change()
-                        correct_bubble.change_displayed_data()
-                        wrong_bubble.change_displayed_data()
+                        bubble1.change_displayed_data()
+                        bubble2.change_displayed_data()
                         score_displayer.number_increase()
                 
-    if (correct_bubble.center[0] > screen_width-correct_bubble.radius) or (correct_bubble.center[0] < correct_bubble.radius):
+    if (bubble1.center[0] > screen_width-bubble1.radius) or (bubble1.center[0] < bubble1.radius):
         movementAmount = -movementAmount
-    correct_bubble.center = ((correct_bubble.center[0] + movementAmount), correct_bubble.center[1] + movementAmount) 
+    bubble1.center = ((bubble1.center[0] + movementAmount), bubble1.center[1] + movementAmount) 
     screen.fill((255,255,255))
-    correct_bubble.draw_bubble()
-    wrong_bubble.draw_bubble()
+    bubble1.draw_bubble()
+    bubble2.draw_bubble()
     #Do things related to the data type displayer
     data_type_displayer.draw_self()
     data_type_displayer.addText()
     #Update the bubble
-    correct_bubble.addText()
-    wrong_bubble.addText()
+    bubble1.addText()
+    bubble2.addText()
     #Update the score screen
     score_displayer.draw_self()
     score_displayer.display_number()
